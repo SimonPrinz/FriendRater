@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -22,13 +23,13 @@ namespace FriendRater.Api
             _Client = new HttpClient { BaseAddress = new Uri(_Environment.BaseUrl) };
         }
 
-        public async Task<ApiWrapper<LoginResponse>> Login(string pUsername, string pPassword)
+        public async Task<LoginResponse> Login(string pUsername, string pPassword)
         {
             _Client.DefaultRequestHeaders.Authorization = null;
             AuthenticationHeaderValue lAuthorization = new AuthenticationHeaderValue(
                 "Basic",
                 Convert.ToBase64String(Encoding.ASCII.GetBytes($"{pUsername}:{pPassword}")));
-            ApiWrapper<LoginResponse> lResponse = null;
+            LoginResponse lResponse = null;
             try
             {
                 using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, "login");
@@ -37,12 +38,12 @@ namespace FriendRater.Api
             }
             finally
             {
-                if (lResponse != null && lResponse.Ok)
+                if (lResponse != null)
                     _Client.DefaultRequestHeaders.Authorization = lAuthorization;
             }
         }
 
-        public async Task<ApiWrapper<bool>> Register(RegisterRequest pRequest)
+        public async Task<bool> Register(RegisterRequest pRequest)
         {
             AuthenticationHeaderValue lAuth = _Client.DefaultRequestHeaders.Authorization;
             _Client.DefaultRequestHeaders.Authorization = null;
@@ -59,13 +60,13 @@ namespace FriendRater.Api
             }
         }
 
-        public async Task<ApiWrapper<List<User>>> Search(string pSearch)
+        public async Task<List<User>> Search(string pSearch)
         {
             using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, $"search?q={HttpUtility.UrlEncode(pSearch)}");
             return await SendAsync<List<User>>(lRequest);
         }
 
-        public async Task<ApiWrapper<List<User>>> NumberSearch(List<string> pNumbers)
+        public async Task<List<User>> NumberSearch(List<string> pNumbers)
         {
             string lJson = JsonConvert.SerializeObject(pNumbers);
             using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Post, "numbersearch");
@@ -74,20 +75,20 @@ namespace FriendRater.Api
         }
 
 #nullable enable
-        public async Task<ApiWrapper<UserProfile>> Profile(Guid? pUserId = null)
+        public async Task<UserProfile> Profile(Guid? pUserId = null)
 #nullable restore
         {
             using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, $"profile{(pUserId.HasValue ? "id=" + pUserId.Value.ToString() : "")}");
             return await SendAsync<UserProfile>(lRequest);
         }
 
-        public async Task<ApiWrapper<List<UserComment>>> Comments(Guid pUserId)
+        public async Task<List<UserComment>> Comments(Guid pUserId)
         {
             using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, $"profile?id={pUserId}");
             return await SendAsync<List<UserComment>>(lRequest);
         }
 
-        private async Task<ApiWrapper<TResponse>> SendAsync<TResponse>(HttpRequestMessage pRequest) where TResponse : new()
+        private async Task<TResponse> SendAsync<TResponse>(HttpRequestMessage pRequest) where TResponse : new()
         {
             try
             {
@@ -95,8 +96,8 @@ namespace FriendRater.Api
                 string lJson = await lResponse.Content.ReadAsStringAsync();
                 ApiWrapper<TResponse> lApiResponse = JsonConvert.DeserializeObject<ApiWrapper<TResponse>>(lJson);
                 if (!lApiResponse.Ok)
-                    throw new ApiException("server returned an error", lApiResponse.Errors);
-                return lApiResponse;
+                    throw new ApiException("server returned an error", lApiResponse.Errors.ToList());
+                return lApiResponse.Data;
             }
             catch (Exception lException)
             {
@@ -150,9 +151,9 @@ namespace FriendRater.Api
     {
         public Error[] Errors { get; }
 
-        public ApiException(string pMessage, List<Error> pErrors = null) : base(pMessage, pErrors != null && pErrors.Count > 0 ? GetExceptionTrace(pErrors) : null)
+        public ApiException(string pMessage, List<Error> pErrors = null) : base(pMessage, pErrors != null && pErrors.Count > 0 ? GetExceptionTrace(pErrors.ToList()) : null)
         {
-            Errors = pErrors.ToArray();
+            Errors = pErrors.ToList().ToArray();
         }
 
         private static Exception GetExceptionTrace(List<Error> pErrors)

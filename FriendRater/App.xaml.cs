@@ -1,12 +1,20 @@
 ﻿using System;
 using System.IO;
+using FriendRater.Api;
 using FriendRater.Data;
+using FriendRater.Views;
 using Xamarin.Forms;
 
 namespace FriendRater
 {
     public partial class App : Application
     {
+#if DEBUG
+        public static ApiEnvironment API = ApiEnvironment.v1Staging;
+#else
+        public static ApiEnvironment API = ApiEnvironment.v1Production;
+#endif
+
         private static Database _Database;
 
         public static Database Database =>
@@ -16,20 +24,7 @@ namespace FriendRater
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
-        }
-
-        protected override void OnStart()
-        {
-        }
-
-        protected override void OnSleep()
-        {
-            
-        }
-
-        protected override void OnResume()
-        {
+            MainPage = new NavigationPage(new LoginView());
         }
     }
 }

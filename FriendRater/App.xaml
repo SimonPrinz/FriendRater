@@ -1,5 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FriendRater.App">
     <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Black">#010101</Color>
+            <Color x:Key="Blue">#02b9ff</Color>
+
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="{StaticResource Black}"/>
+                <Setter Property="PlaceholderColor" Value="{StaticResource Black}"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="TextColor" Value="{StaticResource Black}"/>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FriendRater.Views.RegisterView"
+             NavigationPage.HasNavigationBar="False">
+
+    <StackLayout BackgroundColor="{StaticResource Black}">
+
+        <Image Source="friendrater.jpg"
+               Margin="50,30,50,0"
+               HeightRequest="100"/>
+        <Label TextColor="{StaticResource Blue}"
+               Text="Friend Rater"
+               FontSize="Title"
+               HorizontalOptions="Center"/>
+
+        <Frame x:Name="uiFrameRegister"
+               BackgroundColor="{StaticResource Blue}"
+               Margin="0,20,0,0"
+               HeightRequest="1000">
+            
+            <StackLayout x:Name="uiStacklayoutRegister">
+                
+                <Entry x:Name="uiEntryUsername"
+                        Placeholder="Username"/>
+                <Entry x:Name="uiEntryPassword"
+                        IsPassword="True"
+                        Placeholder="Password"/>
+                <Entry x:Name="uiEntryPasswordAgain"
+                        IsPassword="True"
+                        Placeholder="Repeat Password"/>
+                <Entry x:Name="uiEntryEmail"
+                        Placeholder="Email"/>
+                <Entry x:Name="uiEntryFirstname"
+                        Placeholder="Firstname"/>
+                <Entry x:Name="uiEntryLastname"
+                        Placeholder="Lastname"/>
+                <Entry x:Name="uiEntryPhoneNumber"
+                        Placeholder="Phonenumber"/>
+
+                <StackLayout Orientation="Horizontal">
+
+                    <Button x:Name="uiButtonBack"
+                            Text="Back"
+                            Clicked="OnBack"/>
+                    <Button x:Name="uiButtonRegister"
+                            Text="Register"
+                            HorizontalOptions="EndAndExpand"
+                            Clicked="OnRegister"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</ContentPage>
