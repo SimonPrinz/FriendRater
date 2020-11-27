@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FriendRater.Views.UserView"
+             NavigationPage.HasNavigationBar="True"
+             BackgroundColor="{StaticResource Black}">
+
+    <StackLayout>
+        <StackLayout Margin="20,30,20,20"
+                     Orientation="Horizontal"
+                     HorizontalOptions="Center">
+            <Image Source="friendrater.jpg"
+                   HeightRequest="50"/>
+            <Label TextColor="{StaticResource Blue}"
+                   Text="Friend Rater"
+                   FontSize="Title"
+                   VerticalOptions="Center"/>
+        </StackLayout>
+        
+        <Label Text="{Binding Name}"
+               TextColor="{StaticResource Blue}"
+               FontSize="Title"
+               HorizontalOptions="Center"
+               Margin="0, 0, 0, 20"/>
+        
+        <!-- <Image Source="{Binding Picture}" /> -->
+        
+        <StackLayout Orientation="Horizontal"
+                     Margin="40, 0"
+                     HorizontalOptions="Center">
+               <Label Text="Upvotes:"
+                      TextColor="{StaticResource Blue}"/>
+               <Label Text="{Binding Ratings.Up}"
+                      TextColor="{StaticResource Blue}"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal"
+                     Margin="40, 0"
+                     HorizontalOptions="Center">
+               <Label Text="Downvotes:"
+                      TextColor="{StaticResource Blue}"/>
+               <Label Text="{Binding Ratings.Down}"
+                      TextColor="{StaticResource Blue}"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal"
+                     Margin="40, 0"
+                     HorizontalOptions="Center">
+               <Label Text="Likes:"
+                      TextColor="{StaticResource Blue}"/>
+               <Label Text="{Binding Ratings.Like}"
+                      TextColor="{StaticResource Blue}"/>
+        </StackLayout>
+    </StackLayout>
+</ContentPage>

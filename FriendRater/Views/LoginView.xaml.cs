@@ -1,21 +1,31 @@
 ﻿using System;
 using System.Threading.Tasks;
-using FriendRater.Api;
-using FriendRater.Api.Models;
-using FriendRater.Data;
+using FriendRater.Services;
 using Xamarin.Forms;
 
 namespace FriendRater.Views
 {
     public partial class LoginView : ContentPage
     {
-        private bool _LoginChecked = false;
+        private readonly IApiService _ApiService;
 
-        public LoginView()
+        private bool _LoginChecked;
+        
+        public bool IsLoading { get; internal set; }
+
+        public LoginView(IApiService pApiService)
         {
-            InitializeComponent();
+            _ApiService = pApiService;
 
-            Appearing += OnAppearing;
+            BindingContext = this;
+            
+            InitializeComponent();
+        }
+
+        private void SetIsLoading(bool pFlag)
+        {
+            IsLoading = pFlag;
+            OnPropertyChanged(nameof(IsLoading));
         }
 
         private async void OnAppearing(object sender, EventArgs e)
@@ -26,70 +36,45 @@ namespace FriendRater.Views
 
             await ShowLogin(false);
             uiFrameLogin.IsVisible = true;
-            Credentials lCredentials = await App.Database.GetOptionAsync<Credentials>(nameof(Credentials));
-            if (lCredentials != null)
-            {
-                try
-                {
-                    using ApiClient lClient = new ApiClient(App.API);
-                    await lClient.Login(lCredentials.Username, lCredentials.Password);
-                    await OpenMainView(lCredentials);
-                }
-                catch (Exception)
-                {
-                    uiEntryUsername.Text = lCredentials.Username;
-                    await ShowLogin();
-                }
-            }
+            if (await _ApiService.IsLoggedInAsync())
+                await OpenMainView();
             else
-            {
                 await ShowLogin();
-            }
         }
 
-        private async Task ShowLogin(bool flag = true)
+        private async Task ShowLogin(bool pFlag = true)
         {
-            if (flag) await uiFrameLogin.TranslateTo(0, 0, 500, Easing.SinOut);
+            SetIsLoading(!pFlag);
+            if (pFlag) await uiFrameLogin.TranslateTo(0, 0, 500, Easing.SinOut);
             else await uiFrameLogin.TranslateTo(0, Height, 500, Easing.SinOut);
         }
 
-        private async Task OpenMainView(Credentials pCredentials)
+        private async Task OpenMainView()
         {
-            await Navigation.PushAsync(new MainView(pCredentials));
+            await Navigation.PushAsync(App.Container.Resolve<MainView>());
             Navigation.RemovePage(this);
         }
 
         private async void OnRegister(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new RegisterView());
+            await Navigation.PushAsync(App.Container.Resolve<RegisterView>());
         }
 
         public async void OnLogin(object sender, EventArgs e)
         {
             await ShowLogin(false);
 
-            string lUaername = uiEntryUsername.Text;
-            string lPassword = uiEntryPassword.Text;
-            try
+            if (await _ApiService.LoginAsync(
+                uiEntryUsername.Text,
+                uiEntryPassword.Text,
+                uiCheckboxRememberMe.IsChecked))
             {
-                using ApiClient lClient = new ApiClient(App.API);
-                LoginResponse lResponse = await lClient.Login(lUaername, lPassword);
-                Credentials lCredentials = new Credentials
-                {
-                    Username = lUaername,
-                    Password = lPassword,
-                    Name = lResponse.Name,
-                };
-                if (uiCheckboxRememberMe.IsChecked)
-                    await App.Database.SetOptionAsync<Credentials>(nameof(Credentials), lCredentials);
-                else
-                    await App.Database.DeleteOptionAsync(nameof(Credentials));
-                await OpenMainView(lCredentials);
+                await OpenMainView();
             }
-            catch (Exception)
+            else
             {
                 await this.ShowAlert("Login was not successful. Please check your credentials.", "Ok");
-                await ShowLogin(true);
+                await ShowLogin();
             }
         }
     }

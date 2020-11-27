@@ -1,5 +1,70 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="FriendRater.Views.MainView">
-    <ContentPage.Content>
-    </ContentPage.Content>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FriendRater.Views.MainView"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource Black}">
+    
+    <AbsoluteLayout>
+        
+        <StackLayout AbsoluteLayout.LayoutFlags="All"
+                     AbsoluteLayout.LayoutBounds="0,0,1,1">
+
+            <StackLayout Margin="20,30,20,20"
+                         Orientation="Horizontal"
+                         HorizontalOptions="Center">
+                <Image Source="friendrater.jpg"
+                       HeightRequest="50"/>
+                <Label TextColor="{StaticResource Blue}"
+                       Text="Friend Rater"
+                       FontSize="Title"
+                       VerticalOptions="Center"/>
+            </StackLayout>
+
+            <Label Text="{Binding Banner}"
+                   TextColor="{StaticResource Blue}"
+                   FontSize="Title"
+                   HorizontalOptions="Center"/>
+
+            <Label Text="Your friends"
+                   TextColor="{StaticResource Blue}"
+                   HorizontalOptions="Center"/>
+            
+            <SearchBar x:Name="uiSearchbarSearch"
+                       BackgroundColor="{StaticResource Black}"
+                       TextColor="{StaticResource Blue}"
+                       Placeholder="Search ..."
+                       PlaceholderColor="{StaticResource Blue}"
+                       SearchButtonPressed="OnSearch"
+                       TextChanged="OnSearch"
+                       Unfocused="OnUnfocused"/>
+            
+            <Frame>
+                <StackLayout>
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"/>
+                    <ListView ItemsSource="{Binding Users}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell Tapped="OnUserClick" ClassId="{Binding Id}">
+                                    <StackLayout Padding="9" HorizontalOptions="StartAndExpand" Orientation="Vertical">
+                                        <Label Text="{Binding Name}" FontSize="Medium" WidthRequest="10000" />
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+        
+        <ContentView BackgroundColor="#222222" Opacity="0.5"
+                     AbsoluteLayout.LayoutFlags="All"
+                     AbsoluteLayout.LayoutBounds="0,0,1,1"
+                     IsVisible="{Binding IsLoadingUser}">
+        </ContentView>
+        <ActivityIndicator AbsoluteLayout.LayoutFlags="PositionProportional"
+                           AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                           IsRunning="{Binding IsLoadingUser}"
+                           IsVisible="{Binding IsLoadingUser}" />
+    </AbsoluteLayout>
 </ContentPage>

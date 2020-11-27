@@ -17,6 +17,15 @@ namespace FriendRater.Api
         private readonly ApiEnvironment _Environment;
         private readonly HttpClient _Client;
 
+        public ApiState State => _State;
+        
+        private ApiState _State;
+
+        public ApiClient(ApiState pState): this(pState.Environment)
+        {
+            _Client.DefaultRequestHeaders.Authorization = pState.Authentication;
+        }
+        
         public ApiClient(ApiEnvironment pEnvironment)
         {
             _Environment = pEnvironment;
@@ -39,7 +48,15 @@ namespace FriendRater.Api
             finally
             {
                 if (lResponse != null)
+                {
                     _Client.DefaultRequestHeaders.Authorization = lAuthorization;
+                    _State = new ApiState
+                    {
+                        Environment = _Environment,
+                        Authentication = lAuthorization,
+                        Name = lResponse.Name,
+                    };
+                }
             }
         }
 
@@ -74,11 +91,9 @@ namespace FriendRater.Api
             return await SendAsync<List<User>>(lRequest);
         }
 
-#nullable enable
         public async Task<UserProfile> Profile(Guid? pUserId = null)
-#nullable restore
         {
-            using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, $"profile{(pUserId.HasValue ? "id=" + pUserId.Value.ToString() : "")}");
+            using HttpRequestMessage lRequest = new HttpRequestMessage(HttpMethod.Get, $"profile{(pUserId.HasValue ? "?id=" + pUserId.Value.ToString() : "")}");
             return await SendAsync<UserProfile>(lRequest);
         }
 
@@ -125,6 +140,11 @@ namespace FriendRater.Api
             { nameof(Version), 1 },
             { nameof(BaseUrl), "https://test.friendraterapi.simonprinz.me/v1/" },
         });
+        public static ApiEnvironment v1Development = new ApiEnvironment(new Dictionary<string, object>
+        {
+            { nameof(Version), 1 },
+            { nameof(BaseUrl), "http://localhost:8080/v1/" },
+        });
 
         public int Version => Get<int>();
         public string BaseUrl => Get<string>();
@@ -145,6 +165,15 @@ namespace FriendRater.Api
                 ? lTypedValue
                 : pDefault;
         }
+    }
+
+    public sealed class ApiState
+    {
+        public ApiEnvironment Environment { get; internal set; }
+        
+        public AuthenticationHeaderValue Authentication { get; internal set; }
+        
+        public string Name { get; internal set; }
     }
 
     public class ApiException : Exception

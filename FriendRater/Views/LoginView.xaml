@@ -2,48 +2,60 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FriendRater.Views.LoginView"
-             NavigationPage.HasNavigationBar="False">
+             NavigationPage.HasNavigationBar="False"
+             Appearing="OnAppearing">
+    
+    <AbsoluteLayout>
+        
+        <StackLayout BackgroundColor="{StaticResource Black}"
+                     AbsoluteLayout.LayoutFlags="All"
+                     AbsoluteLayout.LayoutBounds="0,0,1,1">
 
-    <StackLayout BackgroundColor="{StaticResource Black}">
+            <Image Source="friendrater.jpg"
+                   Margin="50,30,50,0"/>
+            <Label TextColor="{StaticResource Blue}"
+                   Text="Friend Rater"
+                   FontSize="Title"
+                   HorizontalOptions="Center"/>
+        
+            <ActivityIndicator Margin="0, 20" 
+                               IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="{StaticResource Blue}"/>
 
-        <Image Source="friendrater.jpg"
-               Margin="50,30,50,0"/>
-        <Label TextColor="{StaticResource Blue}"
-               Text="Friend Rater"
-               FontSize="Title"
-               HorizontalOptions="Center"/>
-
-        <Frame x:Name="uiFrameLogin"
-               IsVisible="False"
-               BackgroundColor="{StaticResource Blue}"
-               Margin="0,30,0,0"
-               HeightRequest="1000">
-            
-            <StackLayout>
+            <Frame x:Name="uiFrameLogin"
+                   IsVisible="False"
+                   BackgroundColor="{StaticResource Blue}"
+                   Margin="0,30,0,0"
+                   HeightRequest="1000">
                 
-                <Entry x:Name="uiEntryUsername"
-                       Placeholder="Username"/>
-                <Entry x:Name="uiEntryPassword"
-                       IsPassword="True"
-                       Placeholder="Password"/>
+                <StackLayout>
+                    
+                    <Entry x:Name="uiEntryUsername"
+                           Placeholder="Username"/>
+                    <Entry x:Name="uiEntryPassword"
+                           IsPassword="True"
+                           Placeholder="Password"/>
 
-                <StackLayout Orientation="Horizontal">
+                    <StackLayout Orientation="Horizontal">
 
-                    <CheckBox x:Name="uiCheckboxRememberMe" />
-                    <Label Text="Remember Me"
-                           VerticalOptions="Center"/>
+                        <CheckBox x:Name="uiCheckboxRememberMe" />
+                        <Label Text="Remember Me"
+                               VerticalOptions="Center"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+
+                        <Button x:Name="uiButtonRegister"
+                                Text="Register"
+                                Clicked="OnRegister"/>
+                        <Button x:Name="uiButtonLogin"
+                                Text="Login"
+                                HorizontalOptions="EndAndExpand"
+                                Clicked="OnLogin"/>
+                    </StackLayout>
                 </StackLayout>
-                <StackLayout Orientation="Horizontal">
-
-                    <Button x:Name="uiButtonRegister"
-                            Text="Register"
-                            Clicked="OnRegister"/>
-                    <Button x:Name="uiButtonLogin"
-                            Text="Login"
-                            HorizontalOptions="EndAndExpand"
-                            Clicked="OnLogin"/>
-                </StackLayout>
-            </StackLayout>
-        </Frame>
-    </StackLayout>
+            </Frame>
+        </StackLayout>
+        
+    </AbsoluteLayout>
 </ContentPage>

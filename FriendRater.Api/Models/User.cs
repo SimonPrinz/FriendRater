@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace FriendRater.Api.Models
 {
-    public class User
+    public class User : IComparable<User>
     {
         [JsonProperty("id")]
         public Guid Id { get; set; }
@@ -13,6 +13,11 @@ namespace FriendRater.Api.Models
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        public int CompareTo(User other)
+        {
+            return Id.CompareTo(other.Id);
+        }
     }
 
     public class UserProfile

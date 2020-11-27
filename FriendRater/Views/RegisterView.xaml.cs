@@ -3,14 +3,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using FriendRater.Api;
 using FriendRater.Api.Models;
+using FriendRater.Services;
 using Xamarin.Forms;
 
 namespace FriendRater.Views
 {
     public partial class RegisterView : ContentPage
     {
-        public RegisterView()
+        private readonly IApiService _ApiService;
+
+        public RegisterView(IApiService pApiService)
         {
+            _ApiService = pApiService;
             InitializeComponent();
         }
 
@@ -24,14 +28,13 @@ namespace FriendRater.Views
             await ShowRegister(false);
             try
             {
-                if (uiEntryPassword.Text.Length < 8)
+                if (uiEntryPassword.Text == null || uiEntryPassword.Text.Length < 8)
                     throw new Exception("The password must be at least 8 characters in length.");
-                if (uiEntryPassword.Text != uiEntryPasswordAgain.Text)
+                if (uiEntryPasswordAgain.Text == null || uiEntryPassword.Text != uiEntryPasswordAgain.Text)
                     throw new Exception("The passwords are not equal.");
-                if (uiEntryUsername.Text.Length < 3 || uiEntryUsername.Text.Length > 16)
+                if (uiEntryUsername.Text == null || uiEntryUsername.Text.Length < 3 || uiEntryUsername.Text.Length > 16)
                     throw new Exception("The username must be between 3 and 16 characters in length.");
-                using ApiClient lClient = new ApiClient(App.API);
-                bool lResponse = await lClient.Register(new RegisterRequest
+                (bool lSuccess, Exception lError) = await _ApiService.RegisterAsync(new RegisterRequest
                 {
                     Email = uiEntryEmail.Text,
                     Firstname = uiEntryFirstname.Text,
@@ -40,8 +43,8 @@ namespace FriendRater.Views
                     PhoneNumber = uiEntryPhoneNumber.Text,
                     Username = uiEntryUsername.Text,
                 });
-                if (!lResponse)
-                    throw new Exception("The account could not be created. Please try again later.");
+                if (!lSuccess)
+                    throw lError;    
                 await this.ShowAlert("The account was created. Please check your emails to activate it.", "Ok");
                 await Navigation.PopAsync();
             }
@@ -54,13 +57,13 @@ namespace FriendRater.Views
                         await this.ShowAlert("The account could not be created. Please check your credentials.", "Ok");
                 else
                     await this.ShowAlert(lException.Message, "Ok");
-                await ShowRegister(true);
+                await ShowRegister();
             }
         }
 
-        private async Task ShowRegister(bool flag = true)
+        private async Task ShowRegister(bool pFlag = true)
         {
-            if (flag) await uiFrameRegister.TranslateTo(0, 0, 500, Easing.SinOut);
+            if (pFlag) await uiFrameRegister.TranslateTo(0, 0, 500, Easing.SinOut);
             else await uiFrameRegister.TranslateTo(0, Height, 500, Easing.SinOut);
         }
     }
